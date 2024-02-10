@@ -1,0 +1,32 @@
+{
+    "general": {
+        "bg": "black",
+        "fg": "white"
+    },
+    "explorer": {
+        "directory": {
+            "bg": "black",
+            "fg": "yellow"
+        },
+        "file": {
+            "bg": "black",
+            "fg": "blue"
+        },
+        "unknown": {
+            "bg": "black",
+            "fg": "white"
+        },
+        "icons": {
+
+        },
+        "show-file-data": true
+    },
+    "editor": {
+        "bg": "black",
+        "fg": "white",
+        "syntax-highlights": {
+            
+        },
+        "auto-save": true
+    }
+}
