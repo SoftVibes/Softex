@@ -23,6 +23,7 @@ open_files = manage_editor.init_open_files()   #Fetch the open files object
 def handle_explorer_events(key):
     global cwd
     global notif_msg
+    global mode
     if key == curses.KEY_UP or key == curses.KEY_DOWN:
         cwd.scroll({curses.KEY_UP: -1, curses.KEY_DOWN: 1}[key])
 
@@ -38,9 +39,7 @@ def handle_explorer_events(key):
             notif_msg = 'Not a file/directory, cannot perform any action on it. Press CTRL+H for help'
 
     elif key == 5:
-        global mode
         mode = 'editor'
-        global notif_msg
         notif_msg = 'Switched mode to editors. Press CTRL+H for help'
 
     elif key == 14:
