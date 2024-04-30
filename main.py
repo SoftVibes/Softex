@@ -12,34 +12,36 @@ import load_settings
 colors = load_settings.fetch_color_profiles()
 
 #Constants (not exactly but yea)
-import manage_directory
+import manage_directory, manage_editor
 mode = 'explorer'   #May be explorer or editor depending on which one is being used
 notif_msg = 'Press CTRL+H for help'   #Msg to be displayed once a major event takes place
 cwd = manage_directory.fetch_cwd()   #Fetch the current working directory
-
+open_files = manage_editor.init_open_files()   #Fetch the open files object
 
 
 #Function to handle keypresses in the explorer
 def handle_explorer_events(key):
     global cwd
+    global notif_msg
     if key == curses.KEY_UP or key == curses.KEY_DOWN:
         cwd.scroll({curses.KEY_UP: -1, curses.KEY_DOWN: 1}[key])
 
     elif key == curses.KEY_ENTER or key == 13 or key == 10:
-        global notif_msg
         if cwd.items[cwd.pos].type == 'dir':
             manage_directory.cd(cwd.items[cwd.pos].name)
             cwd = manage_directory.fetch_cwd()
             notif_msg = 'Changed the current directory. Press CTRL+H for help'
         elif cwd.items[cwd.pos].type == 'file':
-            try:
-                with open(cwd.items[cwd.pos].name, 'r+') as f:
-                    f.write(f.read())
-                
-            except:
-                pass
+            open_files.add_file(cwd.items[cwd.pos].path)
+            notif_msg = f'Opened {cwd.items[cwd.pos].name} in the editor. Press CTRL+E to switch between editor and explorer'
         else:
             notif_msg = 'Not a file/directory, cannot perform any action on it. Press CTRL+H for help'
+
+    elif key == 5:
+        global mode
+        mode = 'editor'
+        global notif_msg
+        notif_msg = 'Switched mode to editors. Press CTRL+H for help'
 
     elif key == 14:
         pass
@@ -55,7 +57,10 @@ def render_explorer():
     stdscr.clear()
     stdscr.refresh()
 
+    #Filling the top line with the directory path 
     stdscr.addstr(0, 0, (cwd.path + ' '*(x - len(cwd.path) if x > len(cwd.path) else 0))[:x], colors.general[1])
+    
+    #Printing the items
     for i in range(top, top + bottom):
         c = None
         if cwd.items[i].type == 'dir':
@@ -68,6 +73,7 @@ def render_explorer():
         c = c[{False: 0, True: 1}[cwd.pos == i]]
         stdscr.addstr(i - top + 1, 0, cwd.items[i].name[:x], c)
 
+    #Printing the notif msg, insstr used to fill the bottom right character on the screen
     global notif_msg
     stdscr.insstr(y - 1, 0, (notif_msg + ' '*(x - len(notif_msg) if x > len(notif_msg) else 0))[:x], colors.general[1])
     stdscr.refresh()
